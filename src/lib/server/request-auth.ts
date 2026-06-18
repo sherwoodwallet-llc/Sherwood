@@ -1,7 +1,10 @@
 import "server-only";
 
 import type { DecodedIdToken } from "firebase-admin/auth";
-import { getFirebaseAdminAuth } from "./firebase-admin";
+import {
+  FirebaseAdminConfigError,
+  getFirebaseAdminAuth,
+} from "./firebase-admin";
 
 export class AuthError extends Error {
   status = 401;
@@ -17,9 +20,12 @@ export async function requireFirebaseUser(
     throw new AuthError("Missing Firebase ID token.");
   }
 
+  const auth = getFirebaseAdminAuth();
+
   try {
-    return await getFirebaseAdminAuth().verifyIdToken(token);
-  } catch {
+    return await auth.verifyIdToken(token);
+  } catch (error) {
+    if (error instanceof FirebaseAdminConfigError) throw error;
     throw new AuthError("Invalid Firebase ID token.");
   }
 }
