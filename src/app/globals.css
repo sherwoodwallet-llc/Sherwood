@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #060806;
+  --foreground: #f4eddf;
+  --cream: #f4eddf;
+  --cream-muted: #bfb5a5;
+  --ink: #060806;
+  --panel: #0c100d;
+  --panel-soft: #111811;
+  --green: #0d3d2d;
+  --green-bright: #21a66f;
+  --gold: #d6b15d;
+  --line: rgba(244, 237, 223, 0.11);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-cream: var(--cream);
+  --color-cream-muted: var(--cream-muted);
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-green: var(--green);
+  --color-green-bright: var(--green-bright);
+  --color-gold: var(--gold);
+  --color-line: var(--line);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.ops-bg {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(33, 166, 111, 0.22), transparent 32rem),
+    radial-gradient(circle at 80% 12%, rgba(214, 177, 93, 0.11), transparent 30rem),
+    linear-gradient(180deg, #070a08 0%, #050705 100%);
+}
+
+.grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(244, 237, 223, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 237, 223, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 15%, #000 0%, transparent 72%);
+}
+
+.glass-panel {
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(244, 237, 223, 0.06), rgba(244, 237, 223, 0.025)),
+    rgba(12, 16, 13, 0.82);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+.field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.035);
+  padding: 0.75rem 0.9rem;
+  color: var(--cream);
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.field:focus {
+  border-color: rgba(214, 177, 93, 0.72);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.field::placeholder {
+  color: rgba(244, 237, 223, 0.32);
 }
