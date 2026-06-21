@@ -36,13 +36,16 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
+  width: 100%;
 }
 
 body {
   background: var(--ink);
   color: var(--cream);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
+  width: 100%;
 }
 
 ::selection {
@@ -87,8 +90,8 @@ body {
 
 .display {
   font-family: var(--font-display), var(--font-inter), sans-serif;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
+  letter-spacing: 0;
+  line-height: 0.98;
 }
 
 .mono {
@@ -155,12 +158,12 @@ body {
 
 .card-panel {
   position: relative;
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   border: 1px solid rgba(243, 237, 224, 0.1);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
   backdrop-filter: blur(12px);
-  padding: 1.75rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
   box-shadow:
     0 30px 60px -30px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);

@@ -56,8 +56,8 @@ function Stat({
     return () => c.stop();
   }, [play, value, mv]);
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
-      <div className="display text-3xl font-semibold text-cream sm:text-4xl">
+    <div className="rounded-xl border border-white/8 bg-white/[0.03] p-4 sm:p-5">
+      <div className="display text-2xl font-semibold text-cream sm:text-3xl lg:text-4xl">
         {prefix}
         {v.toLocaleString(undefined, {
           minimumFractionDigits: decimals,
@@ -65,7 +65,7 @@ function Stat({
         })}
         {suffix}
       </div>
-      <div className="mt-2 text-xs uppercase tracking-wider text-cream/45">{label}</div>
+      <div className="mt-2 text-xs uppercase leading-snug tracking-wider text-cream/45">{label}</div>
     </div>
   );
 }
@@ -90,10 +90,10 @@ export default function Dashboard() {
   }, [reduce]);
 
   return (
-    <section className="relative overflow-hidden py-28 sm:py-36">
-      <div className="pointer-events-none absolute right-1/4 top-0 h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(212,177,95,0.1),transparent_65%)] blur-3xl" />
+    <section className="relative overflow-hidden py-24 sm:py-32 lg:py-36">
+      <div className="pointer-events-none absolute right-1/4 top-0 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(212,177,95,0.1),transparent_65%)] blur-3xl sm:h-[36rem] sm:w-[36rem]" />
       <div ref={ref} className="mx-auto max-w-6xl px-6">
-        <Reveal className="mb-14 text-center">
+        <Reveal className="mb-12 text-center sm:mb-14">
           <p className="mono mb-4 text-xs tracking-[0.3em] text-gold">PLATFORM DASHBOARD</p>
           <h2 className="display text-balance text-4xl font-bold sm:text-5xl lg:text-6xl">
             Every dollar, accounted for.
@@ -102,12 +102,12 @@ export default function Dashboard() {
 
         <Reveal delay={0.1}>
           <div className="card-panel overflow-hidden">
-            <div className="flex items-center justify-between border-b border-white/8 pb-5">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 pb-5">
+              <div className="flex min-w-0 items-center gap-2">
                 <span className="h-3 w-3 rounded-full bg-red-400/70" />
                 <span className="h-3 w-3 rounded-full bg-gold/70" />
                 <span className="h-3 w-3 rounded-full bg-green-bright/70" />
-                <span className="mono ml-3 text-xs text-cream/45">sherwood / overview</span>
+                <span className="mono ml-2 truncate text-xs text-cream/45 sm:ml-3">sherwood / overview</span>
               </div>
               <span className="flex items-center gap-2 text-xs text-green-bright">
                 <span className="relative flex h-2 w-2">
@@ -118,7 +118,7 @@ export default function Dashboard() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-6 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 pt-6 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
               {stats.map((s) => (
                 <Stat
                   key={s.label}
@@ -132,7 +132,7 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <div className="mt-6 rounded-2xl border border-white/8 bg-ink/40 p-5">
+            <div className="mt-6 rounded-xl border border-white/8 bg-ink/40 p-4 sm:p-5">
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-sm font-medium text-cream/80">Live feed</span>
                 <span className="mono text-xs text-cream/40">real-time</span>
@@ -147,9 +147,9 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0, height: "auto" }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm"
+                      className="flex flex-col gap-2 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <span className="flex items-center gap-3">
+                      <span className="flex min-w-0 items-center gap-3">
                         <span
                           className={`flex h-7 w-7 items-center justify-center rounded-full text-xs ${
                             f.kind === "ok"
@@ -159,9 +159,9 @@ export default function Dashboard() {
                         >
                           {f.kind === "ok" ? "✓" : "+"}
                         </span>
-                        <span className="text-cream/80">{f.text}</span>
+                        <span className="min-w-0 leading-snug text-cream/80">{f.text}</span>
                       </span>
-                      <span className="mono text-xs text-cream/35">now</span>
+                      <span className="mono pl-10 text-xs text-cream/35 sm:pl-0">now</span>
                     </motion.li>
                   ))}
                 </AnimatePresence>

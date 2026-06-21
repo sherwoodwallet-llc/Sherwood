@@ -38,9 +38,9 @@ function Cross() {
 
 export default function Categories() {
   return (
-    <section className="relative py-28 sm:py-36">
+    <section className="relative py-24 sm:py-32 lg:py-36">
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal className="mb-16 text-center">
+        <Reveal className="mb-12 text-center sm:mb-16">
           <p className="mono mb-4 text-xs tracking-[0.3em] text-gold">CONTROLLED LIQUIDITY</p>
           <h2 className="display mx-auto max-w-3xl text-balance text-4xl font-bold sm:text-5xl lg:text-6xl">
             Not cash. Not bureaucracy.{" "}
@@ -50,7 +50,7 @@ export default function Categories() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-3xl border border-green-bright/20 bg-gradient-to-b from-green-bright/10 to-transparent p-8">
+            <div className="h-full rounded-2xl border border-green-bright/20 bg-gradient-to-b from-green-bright/10 to-transparent p-6 sm:p-8">
               <div className="mb-6 flex items-center gap-3 text-green-bright">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-bright/15">
                   <Check />
@@ -61,7 +61,7 @@ export default function Categories() {
                 {allowed.map((a) => (
                   <li
                     key={a}
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-cream/80"
+                    className="flex min-h-12 items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 leading-snug text-cream/80"
                   >
                     <span className="text-green-bright">
                       <Check />
@@ -74,7 +74,7 @@ export default function Categories() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <div className="h-full rounded-3xl border border-red-500/15 bg-gradient-to-b from-red-500/10 to-transparent p-8">
+            <div className="h-full rounded-2xl border border-red-500/15 bg-gradient-to-b from-red-500/10 to-transparent p-6 sm:p-8">
               <div className="mb-6 flex items-center gap-3 text-red-400">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-500/15">
                   <Cross />
@@ -85,7 +85,7 @@ export default function Categories() {
                 {blocked.map((b) => (
                   <li
                     key={b}
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-cream/55 line-through decoration-red-400/40"
+                    className="flex min-h-12 items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 leading-snug text-cream/55 line-through decoration-red-400/40"
                   >
                     <span className="text-red-400 no-underline">
                       <Cross />

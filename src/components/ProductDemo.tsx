@@ -60,9 +60,9 @@ export default function ProductDemo() {
   const play = inView && !reduce;
 
   return (
-    <section id="product" className="relative overflow-hidden py-28 sm:py-36">
+    <section id="product" className="relative overflow-hidden py-24 sm:py-32 lg:py-36">
       <div className="mx-auto max-w-7xl px-6">
-        <Reveal className="mb-16 text-center">
+        <Reveal className="mb-12 text-center sm:mb-16">
           <p className="mono mb-4 text-xs tracking-[0.3em] text-gold">LIVE PRODUCT</p>
           <h2 className="display text-balance text-4xl font-bold sm:text-5xl lg:text-6xl">
             Watch a donation become directed aid.
@@ -76,17 +76,18 @@ export default function ProductDemo() {
             animate={{ rotateY: 360 }}
             transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
             style={{ transformStyle: "preserve-3d" }}
-            className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-gradient-to-br from-green-mid/30 to-green/5 blur-2xl"
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden h-72 w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-gradient-to-br from-green-mid/30 to-green/5 blur-2xl sm:block"
           />
 
-          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="relative grid grid-cols-1 gap-5 md:grid-cols-3 lg:gap-6">
             {/* Card 1 — Donate */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               animate={play ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full"
             >
-              <motion.div {...float(0)} className="card-panel">
+              <motion.div {...float(0)} className="card-panel h-full">
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-widest text-cream/45">
                     Donate
@@ -111,8 +112,9 @@ export default function ProductDemo() {
               initial={{ opacity: 0, y: 40 }}
               animate={play ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+              className="h-full"
             >
-              <motion.div {...float(1)} className="card-panel">
+              <motion.div {...float(1)} className="card-panel h-full">
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-widest text-cream/45">
                     Allocated
@@ -144,8 +146,9 @@ export default function ProductDemo() {
               initial={{ opacity: 0, x: 40 }}
               animate={play ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
+              className="h-full"
             >
-              <motion.div {...float(2)} className="card-panel">
+              <motion.div {...float(2)} className="card-panel h-full">
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-widest text-cream/45">
                     Approved
@@ -171,7 +174,7 @@ export default function ProductDemo() {
                   initial={{ opacity: 0.2 }}
                   animate={play ? { opacity: 1 } : {}}
                   transition={{ delay: 1.6, duration: 0.5 }}
-                  className="mt-6 flex items-center gap-2 rounded-xl border border-green-bright/30 bg-green-bright/10 px-3 py-2.5 text-sm text-green-bright"
+                  className="mt-6 flex items-center gap-2 rounded-xl border border-green-bright/30 bg-green-bright/10 px-3 py-2.5 text-sm leading-snug text-green-bright"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path

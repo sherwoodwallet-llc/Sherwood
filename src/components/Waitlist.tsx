@@ -11,10 +11,10 @@ export default function Waitlist() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <section id="join" className="relative overflow-hidden py-28 sm:py-40">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(31,138,99,0.16),transparent_65%)] blur-3xl" />
+    <section id="join" className="relative overflow-hidden py-24 sm:py-32 lg:py-36">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(31,138,99,0.16),transparent_65%)] blur-3xl sm:h-[40rem] sm:w-[40rem]" />
       <div className="relative mx-auto max-w-3xl px-6">
-        <Reveal className="mb-12 text-center">
+        <Reveal className="mb-10 text-center sm:mb-12">
           <p className="mono mb-4 text-xs tracking-[0.3em] text-gold">WAITLIST</p>
           <h2 className="display text-balance text-4xl font-bold sm:text-5xl lg:text-6xl">
             Help build the first programmable aid network.
@@ -37,7 +37,7 @@ export default function Waitlist() {
                   </svg>
                 </div>
                 <h3 className="display mt-6 text-2xl font-semibold">You&apos;re on the list.</h3>
-                <p className="mt-2 max-w-sm text-cream/60">
+                <p className="mt-3 max-w-sm leading-relaxed text-cream/60">
                   We&apos;ll reach out as the pilot opens. Welcome to the payment layer
                   for human need.
                 </p>
@@ -59,7 +59,7 @@ export default function Waitlist() {
                       required
                       type="text"
                       placeholder="Jane Doe"
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50"
+                      className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
                     />
                   </div>
                   <div>
@@ -70,7 +70,7 @@ export default function Waitlist() {
                       required
                       type="email"
                       placeholder="jane@email.com"
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50"
+                      className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
                     />
                   </div>
                 </div>
@@ -85,7 +85,7 @@ export default function Waitlist() {
                         key={r}
                         type="button"
                         onClick={() => setRole(r)}
-                        className={`rounded-full border px-4 py-2 text-sm transition-all ${
+                        className={`min-h-10 rounded-full border px-4 py-2 text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 ${
                           role === r
                             ? "border-gold bg-gold text-ink"
                             : "border-white/10 bg-white/[0.03] text-cream/70 hover:border-white/25"
@@ -104,7 +104,7 @@ export default function Waitlist() {
                   <textarea
                     rows={3}
                     placeholder="Tell us why you want in."
-                    className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50"
+                    className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
                   />
                 </div>
 
@@ -112,7 +112,7 @@ export default function Waitlist() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full rounded-full bg-gold px-8 py-4 text-sm font-semibold text-ink glow-gold"
+                  className="min-h-12 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-semibold text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 glow-gold"
                 >
                   Request Access
                 </motion.button>
