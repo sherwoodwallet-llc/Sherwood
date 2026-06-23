@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Copy, Plus, Search, XCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import {
   addLog,
@@ -10,6 +10,14 @@ import {
   type LogData,
   type OutreachLog,
 } from "@/lib/logs";
+import {
+  ACTIVE_TASK_STATUSES,
+  statusLabels,
+  subscribeOutreachTasks,
+  updateOutreachTask,
+  type OutreachTask,
+  type OutreachTaskStatus,
+} from "@/lib/outreachTasks";
 import { AppHeader } from "./AppHeader";
 
 function isLongFormColumn(header: string) {
@@ -33,8 +41,136 @@ function formatTime(value: Date | null) {
   }).format(value);
 }
 
+function TaskStatusBadge({ status }: { status: OutreachTaskStatus }) {
+  const classes =
+    status === "sent"
+      ? "border-green-bright/30 bg-green-bright/10 text-green-bright"
+      : status === "needs_edit"
+        ? "border-gold/30 bg-gold/10 text-gold"
+        : status === "rejected"
+          ? "border-red-300/30 bg-red-300/10 text-red-200"
+          : "border-line bg-cream/[0.04] text-cream-muted";
+
+  return (
+    <span className={`rounded-full border px-2.5 py-1 text-xs ${classes}`}>
+      {statusLabels[status]}
+    </span>
+  );
+}
+
+function DraftTaskCard({
+  task,
+  notes,
+  saving,
+  onNotesChange,
+  onCopy,
+  onStatus,
+}: {
+  task: OutreachTask;
+  notes: string;
+  saving: boolean;
+  onNotesChange: (value: string) => void;
+  onCopy: () => void;
+  onStatus: (status: OutreachTaskStatus) => void;
+}) {
+  return (
+    <article className="rounded-2xl border border-line bg-cream/[0.035] p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-semibold">{task.organizationName}</h3>
+            <TaskStatusBadge status={task.status} />
+          </div>
+          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-cream-muted">
+            <span>{task.organizationType || "Organization"}</span>
+            {task.organizationWebsite ? (
+              <a
+                href={task.organizationWebsite}
+                target="_blank"
+                rel="noreferrer"
+                className="text-gold transition-colors hover:text-cream"
+              >
+                Website
+              </a>
+            ) : null}
+            <span>{formatTime(task.createdAt)}</span>
+          </div>
+        </div>
+        <a
+          href={`mailto:${task.contactEmail}`}
+          className="text-sm text-gold transition-colors hover:text-cream"
+        >
+          {task.contactName ? `${task.contactName} · ` : ""}
+          {task.contactEmail}
+        </a>
+      </div>
+
+      {task.fitReason ? (
+        <p className="mt-4 text-sm leading-6 text-cream-muted">{task.fitReason}</p>
+      ) : null}
+
+      <div className="mt-4 border-l border-gold/40 pl-4">
+        <p className="text-sm font-medium">{task.draftSubject || "Draft email"}</p>
+        <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-6 text-cream-muted">
+          {task.draftEmail}
+        </pre>
+      </div>
+
+      <textarea
+        className="field mt-4 min-h-20"
+        value={notes}
+        onChange={(event) => onNotesChange(event.target.value)}
+        placeholder="Manager notes"
+      />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={onCopy}
+          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-cream-muted transition-colors hover:text-cream"
+        >
+          <Copy size={16} />
+          Copy draft
+        </button>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => onStatus("sent")}
+          className="inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-sm font-semibold text-ink disabled:opacity-50"
+        >
+          <CheckCircle2 size={16} />
+          Mark sent
+        </button>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => onStatus("needs_edit")}
+          className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-cream-muted transition-colors hover:text-cream disabled:opacity-50"
+        >
+          <AlertTriangle size={16} />
+          Needs edit
+        </button>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => onStatus("rejected")}
+          className="inline-flex items-center gap-2 rounded-full border border-red-300/30 px-4 py-2 text-sm text-red-200 transition-colors hover:border-red-200 disabled:opacity-50"
+        >
+          <XCircle size={16} />
+          Reject
+        </button>
+      </div>
+    </article>
+  );
+}
+
 export function ManagerDashboard() {
   const { user, profile } = useAuth();
+  const [tasks, setTasks] = useState<OutreachTask[]>([]);
+  const [taskNotes, setTaskNotes] = useState<Record<string, string>>({});
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [taskSaving, setTaskSaving] = useState<string | null>(null);
+  const [taskSuccess, setTaskSuccess] = useState<string | null>(null);
   const [logs, setLogs] = useState<OutreachLog[]>([]);
   const [entry, setEntry] = useState<LogData>(emptyEntry);
   const [search, setSearch] = useState("");
@@ -69,6 +205,35 @@ export function ManagerDashboard() {
     };
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    queueMicrotask(() => {
+      if (active) setTasksLoading(true);
+    });
+    const unsub = subscribeOutreachTasks(
+      "own",
+      user.id,
+      (next) => {
+        if (!active) return;
+        setTasks(next);
+        setTaskNotes(
+          Object.fromEntries(next.map((task) => [task.id, task.managerNotes ?? ""])),
+        );
+        setTasksLoading(false);
+      },
+      (err) => {
+        if (!active) return;
+        setError(err.message);
+        setTasksLoading(false);
+      },
+    );
+    return () => {
+      active = false;
+      unsub();
+    };
+  }, [user]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return logs;
@@ -76,6 +241,11 @@ export function ManagerDashboard() {
       Object.values(log.data).join(" ").toLowerCase().includes(q),
     );
   }, [logs, search]);
+
+  const visibleTasks = useMemo(
+    () => tasks.filter((task) => ACTIVE_TASK_STATUSES.includes(task.status)),
+    [tasks],
+  );
 
   function update(col: string, value: string) {
     setEntry((current) => ({ ...current, [col]: value }));
@@ -111,11 +281,86 @@ export function ManagerDashboard() {
     }
   }
 
+  async function updateTaskStatus(task: OutreachTask, status: OutreachTaskStatus) {
+    if (!user) return;
+    setTaskSaving(task.id);
+    setError(null);
+    setTaskSuccess(null);
+    try {
+      await updateOutreachTask(task.id, {
+        status,
+        manager_notes: taskNotes[task.id] ?? "",
+        ...(status === "sent"
+          ? { sent_at: new Date().toISOString(), sent_by: user.id }
+          : {}),
+      });
+      setTaskSuccess(`${task.organizationName} updated.`);
+      window.setTimeout(() => setTaskSuccess(null), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update task.");
+    } finally {
+      setTaskSaving(null);
+    }
+  }
+
+  async function copyDraft(task: OutreachTask) {
+    await navigator.clipboard.writeText(
+      `${task.draftSubject || "Draft email"}\n\n${task.draftEmail}`,
+    );
+    setTaskSuccess("Draft copied.");
+    window.setTimeout(() => setTaskSuccess(null), 2500);
+  }
+
   return (
     <main className="ops-bg min-h-screen px-4 py-8 text-cream sm:px-6">
       <div className="pointer-events-none fixed inset-0 grid-overlay opacity-60" />
       <div className="relative mx-auto max-w-5xl space-y-6">
-        <AppHeader subtitle="Log your partner conversations. You only see the entries you create." />
+        <AppHeader subtitle="Review your assigned outreach drafts, send them manually, then mark each task complete." />
+
+        <section className="rounded-3xl border border-line bg-panel/90 p-5">
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Assigned email drafts</h2>
+              <p className="mt-1 text-sm text-cream-muted">
+                {visibleTasks.length} active {visibleTasks.length === 1 ? "task" : "tasks"}
+              </p>
+            </div>
+            <p className="text-sm text-cream-muted">
+              {tasks.filter((task) => task.status === "sent").length} sent total
+            </p>
+          </div>
+
+          {taskSuccess ? (
+            <p className="mb-4 rounded-2xl border border-green-bright/30 bg-green-bright/10 px-4 py-3 text-sm text-green-bright">
+              {taskSuccess}
+            </p>
+          ) : null}
+
+          <div className="space-y-3">
+            {visibleTasks.map((task) => (
+              <DraftTaskCard
+                key={task.id}
+                task={task}
+                notes={taskNotes[task.id] ?? ""}
+                saving={taskSaving === task.id}
+                onNotesChange={(value) =>
+                  setTaskNotes((current) => ({ ...current, [task.id]: value }))
+                }
+                onCopy={() => {
+                  void copyDraft(task);
+                }}
+                onStatus={(status) => {
+                  void updateTaskStatus(task, status);
+                }}
+              />
+            ))}
+            {visibleTasks.length === 0 ? (
+              <div className="py-12 text-center text-sm text-cream-muted">
+                {tasksLoading ? "Loading assigned drafts…" : "No assigned drafts right now."}
+              </div>
+            ) : null}
+          </div>
+        </section>
 
         <section className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <form
