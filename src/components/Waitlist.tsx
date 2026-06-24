@@ -9,6 +9,8 @@ const roles = ["Donor", "Nonprofit", "Merchant", "Builder", "Investor"];
 export default function Waitlist() {
   const [role, setRole] = useState("Donor");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   return (
     <section id="join" className="relative overflow-hidden py-24 sm:py-32 lg:py-36">
@@ -44,9 +46,44 @@ export default function Waitlist() {
               </div>
             ) : (
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setSubmitted(true);
+
+                  const form = e.currentTarget;
+                  const formData = new FormData(form);
+
+                  setIsSubmitting(true);
+                  setError("");
+
+                  try {
+                    const response = await fetch("/api/waitlist", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        name: formData.get("name"),
+                        email: formData.get("email"),
+                        role,
+                        message: formData.get("message"),
+                      }),
+                    });
+
+                    if (!response.ok) {
+                      const body = (await response.json().catch(() => null)) as
+                        | { error?: string }
+                        | null;
+                      throw new Error(body?.error ?? "Could not join the waitlist.");
+                    }
+
+                    setSubmitted(true);
+                  } catch (submitError) {
+                    setError(
+                      submitError instanceof Error
+                        ? submitError.message
+                        : "Could not join the waitlist.",
+                    );
+                  } finally {
+                    setIsSubmitting(false);
+                  }
                 }}
                 className="space-y-6"
               >
@@ -57,6 +94,7 @@ export default function Waitlist() {
                     </label>
                     <input
                       required
+                      name="name"
                       type="text"
                       placeholder="Jane Doe"
                       className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
@@ -68,6 +106,7 @@ export default function Waitlist() {
                     </label>
                     <input
                       required
+                      name="email"
                       type="email"
                       placeholder="jane@email.com"
                       className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
@@ -102,19 +141,27 @@ export default function Waitlist() {
                     Message
                   </label>
                   <textarea
+                    name="message"
                     rows={3}
                     placeholder="Tell us why you want in."
                     className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-cream placeholder:text-cream/30 outline-none transition-colors focus:border-gold/50 focus:ring-2 focus:ring-gold/10"
                   />
                 </div>
 
+                {error ? (
+                  <p className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+                    {error}
+                  </p>
+                ) : null}
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
+                  disabled={isSubmitting}
                   className="min-h-12 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-semibold text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 glow-gold"
                 >
-                  Request Access
+                  {isSubmitting ? "Requesting..." : "Request Access"}
                 </motion.button>
               </form>
             )}
