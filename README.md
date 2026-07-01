@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sherwood Connect
 
-## Getting Started
+Next.js site for Sherwood, including the outreach manager dashboard at `/outreach`.
 
-First, run the development server:
+## Outreach Flow
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The local Docker agent system creates drafted outreach tasks and inserts them into Supabase. This website reads those Supabase rows:
+
+1. n8n runs the lead outreach workflow.
+2. Subagents research, score, find contacts, and draft emails.
+3. `outreach-task-agent` inserts approved drafts into `outreach_tasks`.
+4. Supabase assigns each task to an active outreach manager.
+5. Managers log in at `/outreach`, copy/send their assigned drafts manually, and mark tasks sent.
+6. The master account sees all tasks and manager progress.
+
+Master account email:
+
+```text
+hadiabdul8128@gmail.com
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open:
 
-## Learn More
+```text
+http://localhost:3000/outreach
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add these to `.env.local` for local development and to Vercel for deployment:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-## Deploy on Vercel
+Only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are used by the browser app. `SUPABASE_SERVICE_ROLE_KEY` is for server-side tooling and agents only. Do not expose it in client code.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Supabase Migration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run this SQL file in the Supabase SQL editor:
+
+```text
+supabase/migrations/20260623000000_outreach_tasks.sql
+```
+
+It creates:
+
+- `profiles`
+- `outreach_tasks`
+- automatic outreach manager numbering
+- row-level security policies
+
+All users except the master email become `outreach_manager` profiles by default when they sign up.
+
+## Checks
+
+```bash
+npm run lint
+npm run build
+```
